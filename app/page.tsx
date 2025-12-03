@@ -48,6 +48,10 @@ export default function PanelLogistica() {
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [pedidosCompletados, setPedidosCompletados] = useState<Pedido[]>([])
   
+  // Estados para código de seguimiento
+  const [codigosSeguimiento, setCodigosSeguimiento] = useState<{[key: string]: string}>({})
+  const [mostrandoInputs, setMostrandoInputs] = useState<{[key: string]: boolean}>({})
+  
   // Estados para formularios
   const [formEnvios, setFormEnvios] = useState({
     cliente: '', producto: '', calle: '', ciudad: '', provincia: '', 
@@ -231,8 +235,8 @@ export default function PanelLogistica() {
   // Renderizar tarjeta de pedido
   const renderPedido = (p: any, esCompletado = false) => {
     const colores = coloresPorTipo[p.tipo as keyof typeof coloresPorTipo] || coloresPorTipo.envios
-    const [codigoSeguimiento, setCodigoSeguimiento] = useState('')
-    const [mostrandoInput, setMostrandoInput] = useState(false)
+    const codigoSeguimiento = codigosSeguimiento[p.id] || ''
+    const mostrandoInput = mostrandoInputs[p.id] || false
     
     return (
       <div
@@ -401,7 +405,7 @@ export default function PanelLogistica() {
               type="text"
               placeholder="Código de seguimiento"
               value={codigoSeguimiento}
-              onChange={(e) => setCodigoSeguimiento(e.target.value)}
+              onChange={(e) => setCodigosSeguimiento({...codigosSeguimiento, [p.id]: e.target.value})}
               style={{
                 width: '100%',
                 padding: '10px',
@@ -422,10 +426,10 @@ export default function PanelLogistica() {
             } else {
               if (mostrandoInput) {
                 marcarEnviado(p.id, codigoSeguimiento)
-                setMostrandoInput(false)
-                setCodigoSeguimiento('')
+                setMostrandoInputs({...mostrandoInputs, [p.id]: false})
+                setCodigosSeguimiento({...codigosSeguimiento, [p.id]: ''})
               } else {
-                setMostrandoInput(true)
+                setMostrandoInputs({...mostrandoInputs, [p.id]: true})
               }
             }
           }}
@@ -453,8 +457,8 @@ export default function PanelLogistica() {
         {!esCompletado && mostrandoInput && (
           <button
             onClick={() => {
-              setMostrandoInput(false)
-              setCodigoSeguimiento('')
+              setMostrandoInputs({...mostrandoInputs, [p.id]: false})
+              setCodigosSeguimiento({...codigosSeguimiento, [p.id]: ''})
             }}
             style={{
               marginTop: 8,
