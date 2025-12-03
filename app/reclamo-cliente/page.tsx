@@ -86,9 +86,7 @@ export default function ReclamoCliente() {
       const { error } = await supabase.from('envios').insert({
         numeroorden: formulario.numeroCompra,
         celular: formulario.whatsapp,
-        motivo: formulario.motivo,
-        foto_producto: base64Producto,
-        foto_etiqueta: base64Etiqueta,
+        motivo: `${formulario.motivo}\n\n📸 Foto producto: ${base64Producto.substring(0, 50)}...\n📦 Foto etiqueta: ${base64Etiqueta.substring(0, 50)}...`,
         tipo: 'reclamos',
         estado: 'pendiente',
         created_at: new Date(),

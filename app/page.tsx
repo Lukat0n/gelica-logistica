@@ -20,8 +20,6 @@ type Pedido = {
   cambioDireccion?: boolean
   motivo?: string
   solucion?: string
-  foto_producto?: string
-  foto_etiqueta?: string
   tipo?: string
   estado?: string
   created_at?: string
@@ -270,54 +268,13 @@ export default function PanelLogistica() {
               {p.motivo && (
                 <div style={{ margin: '8px 0', padding: '8px', background: 'rgba(0,0,0,0.03)', borderRadius: '4px' }}>
                   <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#C62828' }}>Motivo:</p>
-                  <p style={{ margin: 0 }}>{p.motivo}</p>
+                  <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{p.motivo}</p>
                 </div>
               )}
               {p.solucion && (
                 <div style={{ margin: '8px 0', padding: '8px', background: 'rgba(76,175,80,0.1)', borderRadius: '4px' }}>
                   <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#2E7D32' }}>Solución:</p>
                   <p style={{ margin: 0 }}>{p.solucion}</p>
-                </div>
-              )}
-              {(p.foto_producto || p.foto_etiqueta) && (
-                <div style={{ margin: '12px 0' }}>
-                  <p style={{ fontWeight: 600, marginBottom: 8 }}>📷 Fotos adjuntas:</p>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {p.foto_producto && (
-                      <a href={p.foto_producto} target="_blank" rel="noopener noreferrer" style={{ 
-                        display: 'block',
-                        border: '2px solid #ddd',
-                        borderRadius: 8,
-                        overflow: 'hidden',
-                        width: 120,
-                        height: 120,
-                        textDecoration: 'none'
-                      }}>
-                        <img 
-                          src={p.foto_producto} 
-                          alt="Producto" 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      </a>
-                    )}
-                    {p.foto_etiqueta && (
-                      <a href={p.foto_etiqueta} target="_blank" rel="noopener noreferrer" style={{ 
-                        display: 'block',
-                        border: '2px solid #ddd',
-                        borderRadius: 8,
-                        overflow: 'hidden',
-                        width: 120,
-                        height: 120,
-                        textDecoration: 'none'
-                      }}>
-                        <img 
-                          src={p.foto_etiqueta} 
-                          alt="Etiqueta" 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      </a>
-                    )}
-                  </div>
                 </div>
               )}
             </>
