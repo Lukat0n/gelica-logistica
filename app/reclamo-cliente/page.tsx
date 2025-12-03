@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabaseClient'
 export default function ReclamoCliente() {
   const [formulario, setFormulario] = useState({
     numeroCompra: '',
+    whatsapp: '',
     motivo: '',
     fotoProducto: null as File | null,
     fotoEtiqueta: null as File | null,
@@ -53,6 +54,11 @@ export default function ReclamoCliente() {
       return
     }
 
+    if (!formulario.whatsapp.trim()) {
+      alert('Por favor ingresa tu número de WhatsApp')
+      return
+    }
+
     if (!formulario.motivo.trim()) {
       alert('Por favor describe el motivo del reclamo')
       return
@@ -79,6 +85,7 @@ export default function ReclamoCliente() {
       // Guardar reclamo en la base de datos
       const { error } = await supabase.from('envios').insert({
         numeroorden: formulario.numeroCompra,
+        celular: formulario.whatsapp,
         motivo: formulario.motivo,
         foto_producto: base64Producto,
         foto_etiqueta: base64Etiqueta,
@@ -92,6 +99,7 @@ export default function ReclamoCliente() {
       // Limpiar formulario
       setFormulario({
         numeroCompra: '',
+        whatsapp: '',
         motivo: '',
         fotoProducto: null,
         fotoEtiqueta: null,
@@ -158,6 +166,36 @@ export default function ReclamoCliente() {
             placeholder="Ejemplo: #6700"
             value={formulario.numeroCompra}
             onChange={(e) => setFormulario({ ...formulario, numeroCompra: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '2px solid #e0e0e0',
+              borderRadius: 8,
+              fontSize: 16,
+              transition: 'border-color 0.3s',
+              outline: 'none'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+            onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+          />
+        </div>
+
+        {/* Número de WhatsApp */}
+        <div style={{ marginBottom: 24 }}>
+          <label style={{ 
+            display: 'block', 
+            fontWeight: 600, 
+            marginBottom: 8,
+            color: '#333',
+            fontSize: 15
+          }}>
+            Número de WhatsApp <span style={{ color: '#F44336' }}>*</span>
+          </label>
+          <input
+            type="tel"
+            placeholder="Ejemplo: +54 9 11 1234-5678"
+            value={formulario.whatsapp}
+            onChange={(e) => setFormulario({ ...formulario, whatsapp: e.target.value })}
             style={{
               width: '100%',
               padding: '12px 16px',

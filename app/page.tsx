@@ -266,6 +266,7 @@ export default function PanelLogistica() {
           {p.tipo === 'reclamos' && (
             <>
               {p.numeroorden && <p style={{ margin: '4px 0' }}><b>Orden:</b> {p.numeroorden}</p>}
+              {p.celular && <p style={{ margin: '4px 0' }}><b>WhatsApp:</b> {p.celular}</p>}
               {p.motivo && (
                 <div style={{ margin: '8px 0', padding: '8px', background: 'rgba(0,0,0,0.03)', borderRadius: '4px' }}>
                   <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#C62828' }}>Motivo:</p>
