@@ -22,6 +22,7 @@ type Pedido = {
   solucion?: string
   foto_producto?: string
   foto_etiqueta?: string
+  codigo_seguimiento?: string
   tipo?: string
   estado?: string
   created_at?: string
@@ -189,10 +190,19 @@ export default function PanelLogistica() {
   }
 
   // Marcar como completado
-  const marcarEnviado = async (id: string) => {
+  const marcarEnviado = async (id: string, codigoSeguimiento: string) => {
+    if (!codigoSeguimiento.trim()) {
+      alert('Por favor ingresa el código de seguimiento')
+      return
+    }
+
     const { error } = await supabase
       .from('envios')
-      .update({ estado: 'enviado', updated_at: new Date() })
+      .update({ 
+        estado: 'enviado', 
+        codigo_seguimiento: codigoSeguimiento,
+        updated_at: new Date() 
+      })
       .eq('id', id)
 
     if (error) {
@@ -221,6 +231,8 @@ export default function PanelLogistica() {
   // Renderizar tarjeta de pedido
   const renderPedido = (p: any, esCompletado = false) => {
     const colores = coloresPorTipo[p.tipo as keyof typeof coloresPorTipo] || coloresPorTipo.envios
+    const [codigoSeguimiento, setCodigoSeguimiento] = useState('')
+    const [mostrandoInput, setMostrandoInput] = useState(false)
     
     return (
       <div
@@ -366,8 +378,57 @@ export default function PanelLogistica() {
           )}
         </div>
 
+        {/* Mostrar código de seguimiento si existe */}
+        {esCompletado && p.codigo_seguimiento && (
+          <div style={{ 
+            margin: '10px 0',
+            padding: '10px',
+            background: 'rgba(33,150,243,0.1)',
+            borderRadius: 6,
+            border: '1px solid rgba(33,150,243,0.3)'
+          }}>
+            <p style={{ margin: 0, fontSize: 14 }}>
+              <b style={{ color: '#1565C0' }}>📦 Código de seguimiento:</b>
+              <span style={{ marginLeft: 8, fontFamily: 'monospace' }}>{p.codigo_seguimiento}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Input para código de seguimiento en pedidos pendientes */}
+        {!esCompletado && mostrandoInput && (
+          <div style={{ marginTop: 10 }}>
+            <input
+              type="text"
+              placeholder="Código de seguimiento"
+              value={codigoSeguimiento}
+              onChange={(e) => setCodigoSeguimiento(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: 6,
+                border: '2px solid #ddd',
+                fontSize: 14,
+                marginBottom: 8
+              }}
+              autoFocus
+            />
+          </div>
+        )}
+
         <button
-          onClick={() => esCompletado ? deshacerCompletado(p.id) : marcarEnviado(p.id)}
+          onClick={() => {
+            if (esCompletado) {
+              deshacerCompletado(p.id)
+            } else {
+              if (mostrandoInput) {
+                marcarEnviado(p.id, codigoSeguimiento)
+                setMostrandoInput(false)
+                setCodigoSeguimiento('')
+              } else {
+                setMostrandoInput(true)
+              }
+            }
+          }}
           style={{
             marginTop: 10,
             padding: 10,
@@ -380,8 +441,36 @@ export default function PanelLogistica() {
             cursor: 'pointer',
           }}
         >
-          {esCompletado ? '↩️ Deshacer completado' : '✅ Marcar como completado'}
+          {esCompletado 
+            ? '↩️ Deshacer completado' 
+            : mostrandoInput 
+              ? '✅ Confirmar y marcar completado'
+              : '✅ Marcar como completado'
+          }
         </button>
+
+        {/* Botón cancelar si está mostrando el input */}
+        {!esCompletado && mostrandoInput && (
+          <button
+            onClick={() => {
+              setMostrandoInput(false)
+              setCodigoSeguimiento('')
+            }}
+            style={{
+              marginTop: 8,
+              padding: 8,
+              borderRadius: 6,
+              border: '1px solid #999',
+              background: 'white',
+              color: '#666',
+              fontWeight: 500,
+              width: '100%',
+              cursor: 'pointer',
+            }}
+          >
+            Cancelar
+          </button>
+        )}
       </div>
     )
   }
