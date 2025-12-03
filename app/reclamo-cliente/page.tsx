@@ -132,6 +132,15 @@ export default function ReclamoCliente() {
         padding: 32,
         boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
       }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <svg width="200" height="60" viewBox="0 0 800 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0h88v88H0z" fill="#5BC0DE"/>
+            <path d="M22 22h44v44H22z" fill="white"/>
+            <text x="180" y="140" fontFamily="Arial, sans-serif" fontSize="120" fontWeight="bold" fill="#5F7C8A">GÉLICA</text>
+          </svg>
+        </div>
+        
         <h1 style={{ 
           fontSize: 32, 
           fontWeight: 'bold', 

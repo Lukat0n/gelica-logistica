@@ -23,6 +23,7 @@ type Pedido = {
   foto_producto?: string
   foto_etiqueta?: string
   codigo_seguimiento?: string
+  nota?: string
   tipo?: string
   estado?: string
   created_at?: string
@@ -51,6 +52,8 @@ export default function PanelLogistica() {
   // Estados para código de seguimiento
   const [codigosSeguimiento, setCodigosSeguimiento] = useState<{[key: string]: string}>({})
   const [mostrandoInputs, setMostrandoInputs] = useState<{[key: string]: boolean}>({})
+  const [notas, setNotas] = useState<{[key: string]: string}>({})
+  const [dejarNota, setDejarNota] = useState<{[key: string]: boolean}>({})
   
   // Estados para formularios
   const [formEnvios, setFormEnvios] = useState({
@@ -194,7 +197,7 @@ export default function PanelLogistica() {
   }
 
   // Marcar como completado
-  const marcarEnviado = async (id: string, codigoSeguimiento: string) => {
+  const marcarEnviado = async (id: string, codigoSeguimiento: string, nota?: string) => {
     if (!codigoSeguimiento.trim()) {
       alert('Por favor ingresa el código de seguimiento')
       return
@@ -205,6 +208,7 @@ export default function PanelLogistica() {
       .update({ 
         estado: 'enviado', 
         codigo_seguimiento: codigoSeguimiento,
+        nota: nota || null,
         updated_at: new Date() 
       })
       .eq('id', id)
@@ -398,8 +402,24 @@ export default function PanelLogistica() {
           </div>
         )}
 
-        {/* Input para código de seguimiento en pedidos pendientes */}
-        {!esCompletado && mostrandoInput && (
+        {/* Mostrar nota si existe */}
+        {esCompletado && p.nota && (
+          <div style={{ 
+            margin: '10px 0',
+            padding: '10px',
+            background: 'rgba(255,193,7,0.1)',
+            borderRadius: 6,
+            border: '1px solid rgba(255,193,7,0.3)'
+          }}>
+            <p style={{ margin: 0, fontSize: 14 }}>
+              <b style={{ color: '#F57C00' }}>📝 Nota:</b>
+              <span style={{ marginLeft: 8 }}>{p.nota}</span>
+            </p>
+          </div>
+        )}
+
+        {/* Input para código de seguimiento - SIEMPRE VISIBLE en pendientes */}
+        {!esCompletado && (
           <div style={{ marginTop: 10 }}>
             <input
               type="text"
@@ -414,8 +434,45 @@ export default function PanelLogistica() {
                 fontSize: 14,
                 marginBottom: 8
               }}
-              autoFocus
             />
+            
+            {/* Checkbox para dejar nota */}
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 8, 
+              marginBottom: 10,
+              fontSize: 14,
+              cursor: 'pointer'
+            }}>
+              <input
+                type="checkbox"
+                checked={dejarNota[p.id] || false}
+                onChange={(e) => setDejarNota({...dejarNota, [p.id]: e.target.checked})}
+                style={{ width: 16, height: 16, cursor: 'pointer' }}
+              />
+              Dejar una nota
+            </label>
+
+            {/* Textarea para nota */}
+            {dejarNota[p.id] && (
+              <textarea
+                placeholder="Escribe una nota (opcional)"
+                value={notas[p.id] || ''}
+                onChange={(e) => setNotas({...notas, [p.id]: e.target.value})}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: 6,
+                  border: '2px solid #ddd',
+                  fontSize: 14,
+                  minHeight: 80,
+                  resize: 'vertical',
+                  fontFamily: 'inherit',
+                  marginBottom: 8
+                }}
+              />
+            )}
           </div>
         )}
 
@@ -424,13 +481,10 @@ export default function PanelLogistica() {
             if (esCompletado) {
               deshacerCompletado(p.id)
             } else {
-              if (mostrandoInput) {
-                marcarEnviado(p.id, codigoSeguimiento)
-                setMostrandoInputs({...mostrandoInputs, [p.id]: false})
-                setCodigosSeguimiento({...codigosSeguimiento, [p.id]: ''})
-              } else {
-                setMostrandoInputs({...mostrandoInputs, [p.id]: true})
-              }
+              marcarEnviado(p.id, codigoSeguimiento, notas[p.id])
+              setCodigosSeguimiento({...codigosSeguimiento, [p.id]: ''})
+              setNotas({...notas, [p.id]: ''})
+              setDejarNota({...dejarNota, [p.id]: false})
             }
           }}
           style={{
@@ -445,36 +499,8 @@ export default function PanelLogistica() {
             cursor: 'pointer',
           }}
         >
-          {esCompletado 
-            ? '↩️ Deshacer completado' 
-            : mostrandoInput 
-              ? '✅ Confirmar y marcar completado'
-              : '✅ Marcar como completado'
-          }
+          {esCompletado ? '↩️ Deshacer completado' : '✅ Marcar como completado'}
         </button>
-
-        {/* Botón cancelar si está mostrando el input */}
-        {!esCompletado && mostrandoInput && (
-          <button
-            onClick={() => {
-              setMostrandoInputs({...mostrandoInputs, [p.id]: false})
-              setCodigosSeguimiento({...codigosSeguimiento, [p.id]: ''})
-            }}
-            style={{
-              marginTop: 8,
-              padding: 8,
-              borderRadius: 6,
-              border: '1px solid #999',
-              background: 'white',
-              color: '#666',
-              fontWeight: 500,
-              width: '100%',
-              cursor: 'pointer',
-            }}
-          >
-            Cancelar
-          </button>
-        )}
       </div>
     )
   }
