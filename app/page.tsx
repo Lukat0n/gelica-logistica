@@ -37,6 +37,11 @@ const coloresPorTipo = {
 }
 
 export default function PanelLogistica() {
+  // Estados de autenticación
+  const [autenticado, setAutenticado] = useState(false)
+  const [password, setPassword] = useState('')
+  const [imagenModal, setImagenModal] = useState<string | null>(null)
+  
   // Estados principales
   const [vistaActual, setVistaActual] = useState<'lista' | 'historial' | 'formularios'>('lista')
   const [pedidos, setPedidos] = useState<Pedido[]>([])
@@ -283,7 +288,7 @@ export default function PanelLogistica() {
                 <div style={{ margin: '12px 0', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {p.foto_producto && (
                     <button
-                      onClick={() => window.open(p.foto_producto, '_blank')}
+                      onClick={() => setImagenModal(p.foto_producto)}
                       style={{
                         padding: '8px 16px',
                         borderRadius: 6,
@@ -300,7 +305,7 @@ export default function PanelLogistica() {
                   )}
                   {p.foto_etiqueta && (
                     <button
-                      onClick={() => window.open(p.foto_etiqueta, '_blank')}
+                      onClick={() => setImagenModal(p.foto_etiqueta)}
                       style={{
                         padding: '8px 16px',
                         borderRadius: 6,
@@ -391,8 +396,153 @@ export default function PanelLogistica() {
     fontSize: '14px'
   }
 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Cambia esta contraseña por la que quieras
+    if (password === 'gelica2024') {
+      setAutenticado(true)
+      setPassword('')
+    } else {
+      alert('❌ Contraseña incorrecta')
+      setPassword('')
+    }
+  }
+
+  // Pantalla de login
+  if (!autenticado) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px'
+      }}>
+        <div style={{ 
+          background: 'white', 
+          borderRadius: 16,
+          padding: 40,
+          maxWidth: 400,
+          width: '100%',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
+        }}>
+          <h1 style={{ 
+            fontSize: 28, 
+            fontWeight: 'bold', 
+            marginBottom: 12,
+            color: '#333',
+            textAlign: 'center'
+          }}>
+            🔒 Panel Administrativo
+          </h1>
+          <p style={{ 
+            textAlign: 'center', 
+            color: '#666', 
+            marginBottom: 32,
+            fontSize: 16
+          }}>
+            Ingresa tu contraseña para acceder
+          </p>
+          
+          <form onSubmit={handleLogin}>
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                border: '2px solid #e0e0e0',
+                borderRadius: 8,
+                fontSize: 16,
+                marginBottom: 20,
+                outline: 'none'
+              }}
+              autoFocus
+            />
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '14px',
+                borderRadius: 8,
+                border: 'none',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Ingresar
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+      {/* Modal para ver imágenes */}
+      {imagenModal && (
+        <div 
+          onClick={() => setImagenModal(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.9)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            cursor: 'pointer'
+          }}
+        >
+          <div style={{ 
+            position: 'relative',
+            maxWidth: '90%',
+            maxHeight: '90%'
+          }}>
+            <button
+              onClick={() => setImagenModal(null)}
+              style={{
+                position: 'absolute',
+                top: -40,
+                right: 0,
+                background: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: 36,
+                height: 36,
+                fontSize: 20,
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              ✕
+            </button>
+            <img 
+              src={imagenModal} 
+              alt="Vista previa" 
+              style={{ 
+                maxWidth: '100%',
+                maxHeight: '85vh',
+                borderRadius: 8,
+                objectFit: 'contain'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Header con navegación */}
       <div style={{ 
         background: 'white', 
