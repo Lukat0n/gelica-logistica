@@ -37,24 +37,13 @@ export default function ReclamoCliente() {
     }
   }
 
-  const subirImagen = async (file: File, nombreArchivo: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from('reclamos')
-        .upload(`${Date.now()}_${nombreArchivo}`, file)
-
-      if (error) throw error
-
-      // Obtener URL pública
-      const { data: urlData } = supabase.storage
-        .from('reclamos')
-        .getPublicUrl(data.path)
-
-      return urlData.publicUrl
-    } catch (error) {
-      console.error('Error al subir imagen:', error)
-      return null
-    }
+  const convertirImagenABase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
   }
 
   const enviarReclamo = async () => {
@@ -83,20 +72,16 @@ export default function ReclamoCliente() {
     setMensaje('')
 
     try {
-      // Subir imágenes
-      const urlProducto = await subirImagen(formulario.fotoProducto, 'producto.jpg')
-      const urlEtiqueta = await subirImagen(formulario.fotoEtiqueta, 'etiqueta.jpg')
-
-      if (!urlProducto || !urlEtiqueta) {
-        throw new Error('Error al subir las imágenes')
-      }
+      // Convertir imágenes a base64
+      const base64Producto = await convertirImagenABase64(formulario.fotoProducto)
+      const base64Etiqueta = await convertirImagenABase64(formulario.fotoEtiqueta)
 
       // Guardar reclamo en la base de datos
       const { error } = await supabase.from('envios').insert({
         numeroorden: formulario.numeroCompra,
         motivo: formulario.motivo,
-        foto_producto: urlProducto,
-        foto_etiqueta: urlEtiqueta,
+        foto_producto: base64Producto,
+        foto_etiqueta: base64Etiqueta,
         tipo: 'reclamos',
         estado: 'pendiente',
         created_at: new Date(),
