@@ -20,6 +20,8 @@ type Pedido = {
   cambioDireccion?: boolean
   motivo?: string
   solucion?: string
+  foto_producto?: string
+  foto_etiqueta?: string
   tipo?: string
   estado?: string
   created_at?: string
@@ -275,6 +277,44 @@ export default function PanelLogistica() {
                 <div style={{ margin: '8px 0', padding: '8px', background: 'rgba(76,175,80,0.1)', borderRadius: '4px' }}>
                   <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#2E7D32' }}>Solución:</p>
                   <p style={{ margin: 0 }}>{p.solucion}</p>
+                </div>
+              )}
+              {(p.foto_producto || p.foto_etiqueta) && (
+                <div style={{ margin: '12px 0', display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {p.foto_producto && (
+                    <button
+                      onClick={() => window.open(p.foto_producto, '_blank')}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 6,
+                        border: '2px solid #2196F3',
+                        background: '#E3F2FD',
+                        color: '#1565C0',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontSize: 14
+                      }}
+                    >
+                      📸 Ver foto producto
+                    </button>
+                  )}
+                  {p.foto_etiqueta && (
+                    <button
+                      onClick={() => window.open(p.foto_etiqueta, '_blank')}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 6,
+                        border: '2px solid #FF9800',
+                        background: '#FFF3E0',
+                        color: '#E65100',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontSize: 14
+                      }}
+                    >
+                      📦 Ver etiqueta envío
+                    </button>
+                  )}
                 </div>
               )}
             </>
